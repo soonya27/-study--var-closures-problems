@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <p id="help">Helpful notes will appear here</p>
+    <p>E-mail: <input type="text" id="email" name="email"></p>
+    <p>Name: <input type="text" id="name" name="name"></p>
+    <p>Age: <input type="text" id="age" name="age"></p>
+
+
+    <button id="btn">출력</button>
+
+
+
+    <!--  mdn 클로저  예제   -------- https://developer.mozilla.org/ko/docs/Web/JavaScript/Closures -->
+
+    <script>
+        function showHelp0(help) {
+            document.getElementById('help').innerHTML = help
+        }
+        function showHelp(help) {
+            return help;
+        }
+
+        function showHelp2(help) {
+            return () => {
+                document.getElementById('help').innerHTML = help;  //var로 만들경우 함수스코프를 이용하여(이중 함수로) 렉시컬 환경을 하나더 생성.
+                //--> onfocus에서 showHelp가 등록될때 렉시컬환경에 그 당시의 item값을 저장함
+            }
+        }
+
+
+        function setupHelp() {
+            var helpText = [
+                { 'id': 'email', 'help': 'Your e-mail address' },
+                { 'id': 'name', 'help': 'Your full name' },
+                { 'id': 'age', 'help': 'Your age (you must be over 16)' }
+            ];
+
+            for (var i = 0; i < helpText.length; i++) {
+                var item = helpText[i];
+                //onfocus 나 click이벤트 정의할때 당시의 렉시컬 환경을 참조!
+                //var 는 렉시컬 환경.. 이나 클로저(closures)환경을 벗어나기 때문에 onfocus가 실행될때의 렉시컬을 참조하게됨.
+                // 호출 당시의 렉시컬환경에 남아있는 item값은 for문을 다 돌아서 마지막의 item값임.. -> age...
+
+                //0-0. var 버전
+                // document.getElementById(item.id).onfocus = function () {
+                //     console.log(i) //i -> 3
+                //     showHelp0(item.help);
+                // }
+
+
+
+                //0. 아예 let을 사용하면 됨..
+                // for (let i = 0;...)
+
+
+                //1. 내 나름대로 시도해본 렉시컬 환경
+                // const func = showHelp(item.help);
+                // document.getElementById(item.id).onfocus = () => {
+                //     document.getElementById('help').innerHTML = func;
+                // };
+
+                //얘도가능
+                // const func = showHelp(item.help);
+                // document.getElementById(item.id).addEventListener('focus', () => {
+                //     document.getElementById('help').innerHTML = func;
+                // });
+
+
+                //2. mdn 예시의 레시컬 환경
+                // document.getElementById(item.id).onfocus = showHelp2(item.help);  //렉시컬 환경 하나더 생성한 (클로저를 이용한 방법)
+                //얘는 안됨  -> 함수내부의 함수라 또다른 렉시컬 환경
+                // document.getElementById(item.id).addEventListener('focus', () => {
+                //     showHelp2(item.help);
+                // });
+
+
+
+
+            }
+        }
+
+        setupHelp();
+
+
+
+
+    </script>
+</body>
+
+</html>
